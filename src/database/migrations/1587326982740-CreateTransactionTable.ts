@@ -1,4 +1,9 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+} from 'typeorm';
 
 export default class CreateTransactionTable1587326982740
   implements MigrationInterface {
@@ -26,7 +31,7 @@ export default class CreateTransactionTable1587326982740
           },
           {
             name: 'value',
-            type: 'number',
+            type: 'numeric',
             isNullable: false,
           },
           {
@@ -45,6 +50,16 @@ export default class CreateTransactionTable1587326982740
             default: 'now()',
           },
         ],
+      }),
+    );
+
+    await queryRunner.createForeignKey(
+      'transactions',
+      new TableForeignKey({
+        name: 'category_fk',
+        columnNames: ['category_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'categories',
       }),
     );
   }
