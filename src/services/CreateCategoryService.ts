@@ -9,7 +9,7 @@ interface Request {
 class CreateCategoryService {
   public async execute({ title }: Request): Promise<Category> {
     const categoryRepository = getCustomRepository(CategoriesRepository);
-    const newCategory = await categoryRepository.create({ title });
+    const newCategory = categoryRepository.create({ title });
     await categoryRepository.save(newCategory);
     return newCategory;
   }
