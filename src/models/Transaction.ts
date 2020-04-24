@@ -10,6 +10,18 @@ import Category from './Category';
 
 @Entity('transactions')
 class Transaction {
+  constructor(
+    title: string,
+    type: 'income' | 'outcome',
+    value: number,
+    category: Category,
+  ) {
+    this.title = title;
+    this.type = type;
+    this.value = value;
+    this.category = category;
+  }
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

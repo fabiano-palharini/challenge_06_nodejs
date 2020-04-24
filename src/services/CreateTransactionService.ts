@@ -46,6 +46,25 @@ class CreateTransactionService {
 
     return transaction;
   }
+
+  public async saveTransactions(
+    transactions: Transaction[],
+  ): Promise<Transaction[]> {
+    const savedTransactions: Transaction[] = [];
+
+    transactions.forEach(async transaction => {
+      const newTransaction = await this.execute({
+        title: transaction.title,
+        value: transaction.value,
+        type: transaction.type,
+        category: transaction.category.title,
+      });
+
+      savedTransactions.push(newTransaction);
+    });
+
+    return savedTransactions;
+  }
 }
 
 export default CreateTransactionService;

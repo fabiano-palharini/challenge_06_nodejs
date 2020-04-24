@@ -8,6 +8,10 @@ import {
 
 @Entity('categories')
 class Category {
+  constructor(title: string) {
+    this.title = title;
+  }
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
