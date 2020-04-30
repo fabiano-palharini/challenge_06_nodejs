@@ -8,7 +8,7 @@ interface Request {
 class DeleteTransactionService {
   public async execute({ id }: Request): Promise<void> {
     const transactionsRepository = getCustomRepository(TransactionsRepository);
-    transactionsRepository.delete({ id });
+    await transactionsRepository.delete({ id });
   }
 }
 

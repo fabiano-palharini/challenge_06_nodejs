@@ -7,12 +7,6 @@ import CreateTransactionService from '../services/CreateTransactionService';
 import DeleteTransactionService from '../services/DeleteTransactionService';
 import uploadConfig from '../config/upload';
 import ImportTransactionsService from '../services/ImportTransactionsService';
-import Transaction from '../models/Transaction';
-
-// import TransactionsRepository from '../repositories/TransactionsRepository';
-// import CreateTransactionService from '../services/CreateTransactionService';
-// import DeleteTransactionService from '../services/DeleteTransactionService';
-// import ImportTransactionsService from '../services/ImportTransactionsService';
 
 const transactionsRouter = Router();
 const upload = multer(uploadConfig);
@@ -20,13 +14,14 @@ const upload = multer(uploadConfig);
 transactionsRouter.get('/', async (request, response) => {
   const transactionsRepository = getCustomRepository(TransactionsRepository);
   const transactions = await transactionsRepository.find();
-  const balance = await transactionsRepository.getBalance(transactions);
+  const balance = await transactionsRepository.getBalance();
 
   return response.status(200).json({ transactions, balance });
 });
 
 transactionsRouter.post('/', async (request, response) => {
   const { title, value, type, category } = request.body;
+
   const createTransactionsService = new CreateTransactionService();
   const newTransaction = await createTransactionsService.execute({
     title,
@@ -46,7 +41,7 @@ transactionsRouter.delete('/:id', async (request, response) => {
 
 transactionsRouter.post(
   '/import',
-  upload.single('csv_file'),
+  upload.single('file'),
   async (request, response) => {
     const csvFilePath = path.resolve(
       __dirname,
@@ -59,12 +54,7 @@ transactionsRouter.post(
     const importTransactionsService = new ImportTransactionsService();
     const transactions = await importTransactionsService.execute(csvFilePath);
 
-    const createTransactionsService = new CreateTransactionService();
-    const savedTransactions = await createTransactionsService.saveTransactions(
-      transactions,
-    );
-
-    return response.status(200).json(savedTransactions);
+    return response.status(200).json(transactions);
   },
 );
 

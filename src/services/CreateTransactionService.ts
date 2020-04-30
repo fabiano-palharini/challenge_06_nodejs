@@ -5,6 +5,7 @@ import Transaction from '../models/Transaction';
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import CategoriesRepository from '../repositories/CategoriesRepository';
 import CreateCategoryService from './CreateCategoryService';
+import AppError from '../errors/AppError';
 
 interface Request {
   title: string;
@@ -22,24 +23,30 @@ class CreateTransactionService {
   }: Request): Promise<Transaction> {
     const transactionsRepository = getCustomRepository(TransactionsRepository);
     const categoriesRepository = getCustomRepository(CategoriesRepository);
-    const categoryFound = await categoriesRepository.findOne({
+
+    if (type === 'outcome') {
+      const balance = await transactionsRepository.getBalance();
+      if (balance.total - value < 0) {
+        throw new AppError('Insufficient funds', 400);
+      }
+    }
+
+    let transactionCategory = await categoriesRepository.findOne({
       where: { title: category },
     });
 
-    let newCategory;
-
-    if (!categoryFound) {
+    if (!transactionCategory) {
       const createCategoryService = new CreateCategoryService();
-      newCategory = await createCategoryService.execute({ title: category });
-    } else {
-      newCategory = categoryFound;
+      transactionCategory = await createCategoryService.execute({
+        title: category,
+      });
     }
 
     const transaction = transactionsRepository.create({
       title,
       value,
       type,
-      category_id: newCategory.id,
+      category: transactionCategory,
     });
 
     await transactionsRepository.save(transaction);
